@@ -1,49 +1,57 @@
 package com.example.firstApp.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import com.sun.javafx.beans.IDProperty;
+
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "enrolled")
 public class Enrolled {
+
     @Id
     @GeneratedValue
-    private int moduleCode;
-//    @Id
-//    @GeneratedValue
-//    private int studentId;
-    @NotBlank
+    Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "student_id")
+    Student student;
+
+    @ManyToOne
+    @JoinColumn(name = "module_code")
+    Module module;
+
     private String grade;
+
+
 
     public Enrolled(){
         super();
     }
 
-    public Enrolled(int _moduleCode, int _studentId, String grade){
-        super();
-        this.moduleCode = _moduleCode;
-        //this.studentId = _studentId;
-        this.grade = grade;
+    public Long getId() {
+        return id;
     }
 
-    public int getModuleCode() {
-        return moduleCode;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setModuleCode(int moduleCode) {
-        this.moduleCode = moduleCode;
+    public Student getStudent() {
+        return student;
     }
 
-//    public int getStudentId() {
-//        return studentId;
-//    }
+    public void setStudent(Student student) {
+        this.student = student;
+    }
 
-//    public void setStudentId(int studentId) {
-//        this.studentId = studentId;
-//    }
+    public Module getModule() {
+        return module;
+    }
+
+    public void setModule(Module module) {
+        this.module = module;
+    }
 
     public String getGrade() {
         return grade;

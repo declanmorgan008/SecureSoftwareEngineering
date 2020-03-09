@@ -9,7 +9,7 @@ import java.util.Set;
 public class Student {
     @Id
     @GeneratedValue
-    private int studentId;
+    private String studentId;
     @NotBlank
     private String firstName;
     @NotBlank
@@ -21,16 +21,50 @@ public class Student {
     private String phoneNumber;
     @NotBlank
     private String email;
-    @NotBlank
-    private String password;
-    @ManyToMany
-    private Set<Role> roles;
 
     @NotBlank
     private String username;
+    @NotBlank
+    private String password;
+
+    private double accountBalance;
+
+    @OneToMany(mappedBy = "student")
+    Set<Enrolled> enrolledSet;
+
+
+    public double getAccountBalance() {
+        return accountBalance;
+    }
+
+    public void setAccountBalance(double accountBalance) {
+        this.accountBalance = accountBalance;
+    }
+
+    public Set<Enrolled> getEnrolledSet() {
+        return enrolledSet;
+    }
+
+    public void setEnrolledSet(Set<Enrolled> enrolledSet) {
+        this.enrolledSet = enrolledSet;
+    }
 
     public Student(){
         super();
+    }
+
+    public Student(String firstName, String lastName, String phoneNumber, String email, String address, String username, String password){
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.address = address;
+        this.username = username;
+        this.password = password;
+    }
+
+    public void setUsername(String username){
+        this.username = username;
     }
 
     public String getUsername(){
@@ -45,15 +79,9 @@ public class Student {
         this.password = password;
     }
 
-    public Set<Role> getRoles() {
-        return roles;
-    }
 
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
 
-    public int getStudentId() {
+    public String getStudentId() {
         return studentId;
     }
 
@@ -97,7 +125,7 @@ public class Student {
         this.phoneNumber = phoneNumber;
     }
 
-    public void setStudentId(int studentId) {
+    public void setStudentId(String studentId) {
         this.studentId = studentId;
     }
 

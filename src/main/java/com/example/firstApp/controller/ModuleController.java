@@ -1,7 +1,10 @@
 package com.example.firstApp.controller;
 
 import com.example.firstApp.exception.ModuleNotFoundException;
+import com.example.firstApp.exception.StudentNotFoundException;
 import com.example.firstApp.model.Module;
+import com.example.firstApp.model.Student;
+import com.example.firstApp.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -11,23 +14,44 @@ import com.example.firstApp.repository.ModuleRepository;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class ModuleController {
 
     @Autowired
     ModuleRepository moduleRepository;
+    @Autowired
+    StudentRepository studentRepository;
 
     @RequestMapping("/")
     public String welcome(Model model) {
         model.addAttribute("message", "Hello World !!!");
-        return "home";
+        System.out.println(studentRepository.toString());
+        return "welcome";
+    }
+
+    @RequestMapping(value ="/view_classes/{user-id}", method = RequestMethod.GET)
+    public String showUser(@PathVariable("user-id") int userID, Model model) throws StudentNotFoundException {
+        List<Student> listBooks = studentRepository.findAll();
+        model.addAttribute("listStudents", listBooks);
+        Optional<Student> returnedStudent = studentRepository.findById(4);
+
+        if(returnedStudent.isPresent()){
+            Student myStudent = returnedStudent.get();
+            model.addAttribute("message", myStudent.getFirstName());
+        }
+
+        return "welcome";
+        //return studentRepository.findById(userID).orElseThrow(()-> new StudentNotFoundException(userID));
     }
 
     // Get All Modules
     @GetMapping("/modules")
-    public List<Module> getAllModules() {
-        return moduleRepository.findAll();
+    public String getAllModules(Model model) {
+        model.addAttribute("moduleList", moduleRepository.findAll());
+        model.addAttribute("elemCount", moduleRepository.count());
+        return "modules";
     }
 
     // Create a new Module
@@ -74,5 +98,17 @@ public class ModuleController {
 
         return ResponseEntity.ok().build();
     }
+
+    @RequestMapping(value="welcome/{username}/modules/{username}/{password}", method = RequestMethod.GET)
+    public String viewModules(@PathVariable("username") String username, @PathVariable("password") String password, Model model){
+        model.addAttribute("username", username);
+        model.addAttribute("password", password);
+        model.addAttribute(moduleRepository.findAll());
+        return "modules";
+    }
+
+
+
+
 
 }

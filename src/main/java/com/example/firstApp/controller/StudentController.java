@@ -2,9 +2,6 @@ package com.example.firstApp.controller;
 
 import com.example.firstApp.exception.StudentNotFoundException;
 import com.example.firstApp.model.Student;
-import com.example.firstApp.service.SecurityService;
-import com.example.firstApp.service.StudentService;
-import com.example.firstApp.utils.PassEncoding;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,21 +14,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class StudentController {
 
     @Autowired
     StudentRepository studentRepository;
-
-
-    @Autowired
-    StudentService studentService;
-
-
-
-    @Autowired
-    private SecurityService securityService;
 
 
     @GetMapping("/register")
@@ -44,28 +33,45 @@ public class StudentController {
     @PostMapping("/register")
     public String registration(@ModelAttribute("userForm") Student userForm, BindingResult bindingResult) {
 
-
         if (bindingResult.hasErrors()) {
             return "register";
         }
 
-        studentService.save(userForm);
+        userForm.setAccountBalance(-3245.00);
+        studentRepository.save(userForm);
 
-        securityService.autoLogin(userForm.getUsername(), userForm.getPassword());
-
-        return "redirect:/welcome";
+        return "redirect:/login";
     }
 
-    @GetMapping("/login")
-    public String login(Model model, String error, String logout) {
-        if (error != null)
-            model.addAttribute("error", "Your username and password is invalid.");
-
-        if (logout != null)
-            model.addAttribute("message", "You have been logged out successfully.");
-
+    @RequestMapping("/login")
+    public String login(Model model){
         return "login";
     }
+
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public String login(@RequestParam("_username") String username, @RequestParam("_password") String password, Model model){
+
+        return "redirect:/welcome/" + username + "/" + password;
+    }
+
+    @RequestMapping(value = "/welcome/{username}/{password}", method=RequestMethod.GET)
+    public String showUser(@PathVariable("username") String username, @PathVariable("password") String password, Model model){
+        Optional<Student> returned = studentRepository.findByUsername(username, password);
+        if(returned.isPresent()){
+            Student myReturnedStudent = returned.get();
+            model.addAttribute("message", myReturnedStudent.getFirstName());
+            model.addAttribute("Enrolled", myReturnedStudent.getEnrolledSet());
+            model.addAttribute("elemCount", myReturnedStudent.getEnrolledSet().size());
+            model.addAttribute("viewModulesLink", "modules/"+ myReturnedStudent.getUsername()+"/"+myReturnedStudent.getPassword());
+        }else{
+            model.addAttribute("Error", "Error: No User found, try again.");
+        }
+
+        return "view_classes";
+    }
+
+
+
 
     @GetMapping({"/", "/welcome"})
     public String welcome(Model model) {

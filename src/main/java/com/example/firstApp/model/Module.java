@@ -2,6 +2,8 @@ package com.example.firstApp.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.Set;
+
 @Entity
 @Table(name = "modules")
 public class Module {
@@ -22,6 +24,9 @@ public class Module {
     private String startDate;
     @NotBlank
     private String endDate;
+
+    @OneToMany(mappedBy = "module")
+    Set<Enrolled> enrolledSet;
 
     public Module(){
         super();
